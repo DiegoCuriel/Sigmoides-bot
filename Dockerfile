@@ -5,11 +5,10 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copia los archivos de requisitos y la aplicación
-COPY requirements.txt requirements.txt
-COPY . .
-
-# Instala las dependencias
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
 
 # Expone el puerto que Uvicorn usará
 EXPOSE 8000
