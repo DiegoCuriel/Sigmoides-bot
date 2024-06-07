@@ -1,0 +1,6 @@
+# dotenv
+.env
+
+# Otros archivos y carpetas a ignorar
+__pycache__/
+chroma_db/
