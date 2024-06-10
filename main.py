@@ -67,7 +67,7 @@ def answer_question(query):
         print(f"Similitud máxima: {max_similarity}")
         
         # Umbral de similitud para considerar la respuesta válida
-        threshold = 0.5
+        threshold = 0.8  # Incrementar el umbral a 0.8 para ser más estricto
         
         if max_similarity > threshold:
             print(f"Respuesta válida encontrada con similitud: {max_similarity}")
