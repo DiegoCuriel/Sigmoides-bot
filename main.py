@@ -138,8 +138,7 @@ def read_root():
 
 @app.on_event("startup")
 async def startup_event():
-    import asyncio
-    asyncio.create_task(bot.start(discord_token))
+    await bot.start(discord_token)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
