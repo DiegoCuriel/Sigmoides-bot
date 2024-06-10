@@ -47,26 +47,37 @@ def cosine_similarity_manual(vec1, vec2):
     return dot_product / magnitude
 
 def answer_question(query):
+    print(f"Recibida pregunta: {query}")
     result = qa_chain.invoke(query)
     answer = result['result']
+    print(f"Respuesta generada: {answer}")
     
     # Verificar si la respuesta está dentro del contexto de los documentos cargados
-    query_embedding = embeddings_model.embed_query(query)
-    answer_embedding = embeddings_model.embed_query(answer)
-    
-    document_embeddings = [embeddings_model.embed_query(doc.page_content) for doc in docs]
-    
-    # Calcular la similitud coseno manualmente
-    similarities = [cosine_similarity_manual(answer_embedding, doc_embedding) for doc_embedding in document_embeddings]
-    max_similarity = max(similarities)
-    
-    # Umbral de similitud para considerar la respuesta válida
-    threshold = 0.5
-    
-    if max_similarity > threshold:
-        return answer
-    else:
-        return "Lo siento, no puedo responder esa pregunta con la información disponible."
+    try:
+        query_embedding = embeddings_model.embed_query(query)
+        answer_embedding = embeddings_model.embed_query(answer)
+        print(f"Embeddings generados para la pregunta y la respuesta.")
+
+        document_embeddings = [embeddings_model.embed_query(doc.page_content) for doc in docs]
+        print(f"Embeddings generados para los documentos.")
+
+        # Calcular la similitud coseno manualmente
+        similarities = [cosine_similarity_manual(answer_embedding, doc_embedding) for doc_embedding in document_embeddings]
+        max_similarity = max(similarities)
+        print(f"Similitud máxima: {max_similarity}")
+        
+        # Umbral de similitud para considerar la respuesta válida
+        threshold = 0.5
+        
+        if max_similarity > threshold:
+            print(f"Respuesta válida encontrada con similitud: {max_similarity}")
+            return answer
+        else:
+            print(f"No hay suficiente contexto para responder la pregunta.")
+            return "No tengo suficiente contexto para responder esa pregunta ._."
+    except Exception as e:
+        print(f"Error durante la verificación del contexto: {e}")
+        return "Hubo un error al procesar tu pregunta."
 
 # Configuración del bot de Discord
 intents = discord.Intents.default()
@@ -90,13 +101,18 @@ async def commands_command(ctx):
 @bot.command(name='info')
 async def info_command(ctx):
     info_text = """
-    Este es un bot sigma que puede responder preguntas relacionadas con la nutrición y salud. 
-    ¡Preguntame lo que quieras!
+    Este es un bot sigma que puede responder preguntas relacionadas con la nutrición y salud.
+    
+    Preguntame sobre:
+    Beneficios de Diferentes Alimentos
+    Dietas Balanceadas
+    Ejercicio y Bienestar
     """
     await ctx.send(info_text)
 
 @bot.command(name='preguntar')
 async def preguntar(ctx, *, question):
+    print(f"Pregunta recibida en Discord: {question}")
     answer = answer_question(question)
     await ctx.send(f"Pregunta: {question}\nRespuesta: {answer}")
 
