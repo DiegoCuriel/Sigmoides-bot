@@ -6,3 +6,4 @@ langchain-openai
 langchain-community
 langchain
 discord.py
+gunicorn
