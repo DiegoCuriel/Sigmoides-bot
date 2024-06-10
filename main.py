@@ -9,8 +9,7 @@ from fastapi import FastAPI
 import uvicorn
 import discord
 from discord.ext import commands
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
+from math import sqrt
 
 # Cargar variables de entorno
 load_dotenv()
@@ -40,6 +39,13 @@ vector_store = Chroma.from_documents(documents=docs, embedding=embeddings_model,
 llm = OpenAI(api_key=openai.api_key)
 qa_chain = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=vector_store.as_retriever())
 
+def cosine_similarity_manual(vec1, vec2):
+    dot_product = sum(p*q for p, q in zip(vec1, vec2))
+    magnitude = sqrt(sum([val**2 for val in vec1])) * sqrt(sum([val**2 for val in vec2]))
+    if not magnitude:
+        return 0
+    return dot_product / magnitude
+
 def answer_question(query):
     result = qa_chain.invoke(query)
     answer = result['result']
@@ -50,9 +56,9 @@ def answer_question(query):
     
     document_embeddings = [embeddings_model.embed_query(doc.page_content) for doc in docs]
     
-    # Calcular la similitud coseno
-    similarities = cosine_similarity([answer_embedding], document_embeddings)
-    max_similarity = np.max(similarities)
+    # Calcular la similitud coseno manualmente
+    similarities = [cosine_similarity_manual(answer_embedding, doc_embedding) for doc_embedding in document_embeddings]
+    max_similarity = max(similarities)
     
     # Umbral de similitud para considerar la respuesta válida
     threshold = 0.5
