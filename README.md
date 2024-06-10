@@ -1,2 +1,0 @@
-# Sigmoides-bot
-readme
